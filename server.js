@@ -123,11 +123,25 @@ app.post('/users', function (req, res) {
 		res.json(user.toPublicJSON());
 	}, function (e) {
 		res.status(400).json(e);
-        console.log(e);
 	});
 });
 
-db.sequelize.sync().then(function () {
+//post /users/login
+//validate check req.body.email and req.body.password is string (type of)
+//send back 400 if not
+//send back request body
+
+app.post('/users/login', function (req, res) {
+    var body = _.pick(req.body, 'email', 'password');
+
+    db.user.authenticate(body).then(function (user) {
+        res.json(user.toPublicJSON());
+    }, function () {
+        res.status(401).send();
+    });
+});
+
+db.sequelize.sync({force: true}).then(function () {
     app.listen(PORT, function () {
         console.log('Express listening on port ' + PORT);
     })
